@@ -17,10 +17,15 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from airflow.hooks.postgres_hook import PostgresHook
-from airflow.hooks.S3_hook import S3Hook
+# Widely Available Packages -- if it's a core Python package or on PyPi, put it here.
+
+# Airflow Base Classes
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
+
+# Airflow Extended Classes 
+from airflow.hooks.postgres_hook import PostgresHook
+from airflow.hooks.S3_hook import S3Hook
 
 
 class S3QueryToRedshiftOperator(BaseOperator):
