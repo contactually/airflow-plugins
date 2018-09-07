@@ -19,6 +19,7 @@
 
 # Widely Available Packages -- if it's a core Python package or on PyPi, put it here.
 import datetime
+from sqlalchemy import text
 
 # Airflow Base Classes
 from airflow.models import BaseOperator
@@ -51,6 +52,9 @@ class SalesforceUpsertOperator(BaseOperator):
     :param lookup_mapping: list of dictionaries with key-value pair indicating the field name 
         and external field name used for lookup in the form {lookup_field_name__c: external_field_name__c}
     :type lookup_mapping: list of dictionaries
+    :param sql_params: allows for parameterization of SQL according to sqlalchemy docs;
+        e.g. 'WHERE id = :id' in SQL and pass {'id': 1} will parameterize :id as 1
+    :type sql_params: dictionary
     """
 
     template_fields = ()
@@ -69,6 +73,7 @@ class SalesforceUpsertOperator(BaseOperator):
             salesforce_conn_id='salesforce_default',
             no_null_list=[],
             lookup_mapping={},
+            sql_params={},
             *args, **kwargs):
         super(SalesforceUpsertOperator, self).__init__(*args, **kwargs)
         self.salesforce_object = salesforce_object
@@ -80,6 +85,7 @@ class SalesforceUpsertOperator(BaseOperator):
         self.salesforce_conn_id = salesforce_conn_id
         self.no_null_list = no_null_list
         self.lookup_mapping = lookup_mapping
+        self.sql_params = sql_params
 
     def execute(self, context):
         self.database = PostgresHook(postgres_conn_id=self.database_conn_id)
@@ -90,11 +96,11 @@ class SalesforceUpsertOperator(BaseOperator):
             key=self.query_s3_key,
             bucket_name=self.query_s3_bucket
             )
-        query = s3_object.get()['Body'].read().decode('utf-8')
+        query = text(s3_object.get()['Body'].read().decode('utf-8'))
 
         engine = self.database.get_sqlalchemy_engine()
         con = engine.connect()
-        result = con.execute(query)
+        result = con.execute(query, self.sql_params)
 
         records = []
         mapping = {k.lower(): v.lower() for k, v in self.lookup_mapping.items()}
