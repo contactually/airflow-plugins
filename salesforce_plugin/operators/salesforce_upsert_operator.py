@@ -67,8 +67,8 @@ class SalesforceUpsertOperator(BaseOperator):
             database_conn_id='database_default',
             aws_conn_id='aws_default',
             salesforce_conn_id='salesforce_default',
-            no_null_list=None,
-            lookup_mapping=None,
+            no_null_list=[],
+            lookup_mapping={},
             *args, **kwargs):
         super(CustomRedshiftToS3Operator, self).__init__(*args, **kwargs)
         self.salesforce_object = salesforce_object
