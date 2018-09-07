@@ -20,6 +20,7 @@
 # Widely Available Packages -- if it's a core Python package or on PyPi, put it here.
 import datetime
 from sqlalchemy import text
+from ast import literal_eval
 
 # Airflow Base Classes
 from airflow.models import BaseOperator
@@ -53,12 +54,12 @@ class SalesforceUpsertOperator(BaseOperator):
         and external field name used for lookup in the form {lookup_field_name__c: external_field_name__c}
     :type lookup_mapping: list of dictionaries
     :param sql_params: allows for parameterization of SQL according to sqlalchemy docs;
-        e.g. 'WHERE id = :id' in SQL and pass {'id': 1} will parameterize :id as 1
+        e.g. 'WHERE id = :id' in SQL and pass {'id': 1} will parameterize :id as 1 (templated)
     :type sql_params: dictionary
     """
 
-    template_fields = ()
-    template_ext = ()
+    template_fields = ('sql_params',)
+    template_ext = dict()
     ui_color = '#ededed'
 
     @apply_defaults
@@ -88,6 +89,9 @@ class SalesforceUpsertOperator(BaseOperator):
         self.sql_params = sql_params
 
     def execute(self, context):
+        if type(self.sql_params) is str:
+            self.sql_params = literal_eval(self.sql_params)
+
         self.database = PostgresHook(postgres_conn_id=self.database_conn_id)
         self.s3 = S3Hook(aws_conn_id=self.aws_conn_id)
         self.salesforce = SalesforceHook(conn_id=self.salesforce_conn_id)
