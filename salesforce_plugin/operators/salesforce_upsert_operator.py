@@ -117,31 +117,3 @@ class SalesforceUpsertOperator(BaseOperator):
         self.log.info("Upsert operation on {salesforce_object} beginning...".format(salesforce_object=salesforce_object))
         salesforce.upsert(self.salesforce_object, self.upsert_field, records)
         self.log.info("Upsert operation on {salesforce_object} complete!".format(salesforce_object=salesforce_object))
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
