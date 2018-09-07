@@ -84,7 +84,7 @@ class SalesforceUpsertOperator(BaseOperator):
     def execute(self, context):
         self.database = PostgresHook(postgres_conn_id=self.database_conn_id)
         self.s3 = S3Hook(aws_conn_id=self.aws_conn_id)
-        self.salesforce = SalesforceHook(salesforce_conn_id=self.salesforce_conn_id)
+        self.salesforce = SalesforceHook(conn_id=self.salesforce_conn_id)
 
         s3_object = self.s3.get_key(
             key=self.query_s3_key,
@@ -92,7 +92,7 @@ class SalesforceUpsertOperator(BaseOperator):
             )
         query = s3_object.get()['Body'].read().decode('utf-8')
 
-        engine = database.get_sqlalchemy_engine()
+        engine = self.database.get_sqlalchemy_engine()
         con = engine.connect()
         result = con.execute(query)
 
@@ -114,6 +114,6 @@ class SalesforceUpsertOperator(BaseOperator):
                     row_dict[column] = value
             records.append(row_dict)
 
-        self.log.info("Upsert operation on {salesforce_object} beginning...".format(salesforce_object=salesforce_object))
-        salesforce.upsert(self.salesforce_object, self.upsert_field, records)
-        self.log.info("Upsert operation on {salesforce_object} complete!".format(salesforce_object=salesforce_object))
+        self.log.info("Upsert operation on {salesforce_object} beginning...".format(salesforce_object=self.salesforce_object))
+        self.salesforce.upsert(self.salesforce_object, self.upsert_field, records)
+        self.log.info("Upsert operation on {salesforce_object} complete!".format(salesforce_object=self.salesforce_object))
