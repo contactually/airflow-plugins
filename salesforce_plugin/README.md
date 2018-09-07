@@ -32,3 +32,5 @@ This operator retrieves SQL from S3, runs the code on a specified Postgres DB, a
 						specified field. Ex. ['custom_field__c']
 - `lookup_mapping`      Dictionary used to map lookup fields to respective external ID lookup. Ex. {'custom_field__r': 'external_field__c'}
 						Note that lookup fields must be suffixed with '__r' in order to perform the lookup properly.
+- `sql_params`			Allows for parameterization of SQL according to sqlalchemy docs;
+        				e.g. 'WHERE id = :id' in SQL and pass {'id': 1} will parameterize :id as 1
