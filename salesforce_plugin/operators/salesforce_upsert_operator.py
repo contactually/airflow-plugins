@@ -70,7 +70,7 @@ class SalesforceUpsertOperator(BaseOperator):
             no_null_list=[],
             lookup_mapping={},
             *args, **kwargs):
-        super(CustomRedshiftToS3Operator, self).__init__(*args, **kwargs)
+        super(SalesforceUpsertOperator, self).__init__(*args, **kwargs)
         self.salesforce_object = salesforce_object
         self.upsert_field = upsert_field
         self.query_s3_bucket = query_s3_bucket
