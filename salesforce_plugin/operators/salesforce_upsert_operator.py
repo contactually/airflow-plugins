@@ -84,7 +84,7 @@ class SalesforceUpsertOperator(BaseOperator):
     def execute(self, context):
         self.database = PostgresHook(postgres_conn_id=self.database_conn_id)
         self.s3 = S3Hook(aws_conn_id=self.aws_conn_id)
-        self.salesforce = SalesforceHook(salesforce_conn_id=salesforce_conn_id)
+        self.salesforce = SalesforceHook(salesforce_conn_id=self.salesforce_conn_id)
 
         s3_object = self.s3.get_key(
             key=self.query_s3_key,
