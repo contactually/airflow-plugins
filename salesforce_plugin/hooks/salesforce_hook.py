@@ -111,7 +111,7 @@ class SalesforceHook(BaseHook, LoggingMixin):
                 result = obj.upsert('{external_id_field}/{external_id}'.format(external_id_field=external_id_field, external_id=external_id), record)
             except Exception as e:
                 self.log.error("Error upserting to {salesforce_object}! Error: {error}".format(salesforce_object=salesforce_object, error=e))
-                self.log.error("Error record: {record}".format(record=record[external_id_field]))
+                self.log.error("Error record for {external_id_field} {external_id}: {record}".format(external_id_field=external_id_field, external_id=external_id, record=record))
 
         return self.log.info("{records_length} record(s) upserted to {salesforce_object}".format(records_length=len(records), salesforce_object=salesforce_object))
 
@@ -148,7 +148,7 @@ class SalesforceHook(BaseHook, LoggingMixin):
                         self.log.info(result)
                     except Exception as e:
                         self.log.error("Error upserting to {salesforce_object}! Error: {error}".format(salesforce_object=salesforce_object, error=e))
-                        self.log.error("Error record: {record}".format(record=record[external_id_field]))
+                        self.log.error("Error record for {external_id_field} {external_id}: {record}".format(external_id_field=external_id_field, external_id=external_id, record=record))
 
 
         return self.log.info("{records_length} record(s) bulk upserted to {salesforce_object}".format(records_length=len(records), salesforce_object=salesforce_object))
