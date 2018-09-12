@@ -110,9 +110,8 @@ class SalesforceHook(BaseHook, LoggingMixin):
                 record.pop(external_id_field.lower())
                 result = obj.upsert('{external_id_field}/{external_id}'.format(external_id_field=external_id_field, external_id=external_id), record)
             except Exception as e:
-                self.log.error(
-                    "Error upserting to {salesforce_object}! Error: {error}".format(salesforce_object=salesforce_object, error=e)
-                )
+                self.log.error("Error upserting to {salesforce_object}! Error: {error}".format(salesforce_object=salesforce_object, error=e))
+                self.log.error("Error record: {record}".format(record=record[external_id_field]))
 
         return self.log.info("{records_length} record(s) upserted to {salesforce_object}".format(records_length=len(records), salesforce_object=salesforce_object))
 
@@ -131,14 +130,28 @@ class SalesforceHook(BaseHook, LoggingMixin):
         self.sign_in()
 
         obj = self.sf.bulk.__getattr__('{salesforce_object}'.format(salesforce_object=salesforce_object))
+        batchsize = 5000
 
-        try:
-            result = obj.upsert(records, external_id_field)
-            return self.log.info("{records_length} record(s) bulk upserted to {salesforce_object}".format(records_length=len(records), salesforce_object=salesforce_object))
-        except Exception as e:
-            self.log.error(
-                "Error bulk upserting to {salesforce_object}! Error: {error}".format(salesforce_object=salesforce_object, error=e)
-            )
+        for i in range(0, len(records), batchsize):
+            batch = records[i:i+batchsize]
+            try:
+                self.log.info("Bulk upserting records {start} to {end} out of {records_length}".format(start=i+1, end=i+batchsize if i+batchsize < len(records) else len(records), records_length=len(records)))
+                result = obj.upsert(batch, external_id_field)
+            except Exception as e:
+                self.log.error("Error bulk upserting to {salesforce_object}! Error: {error}. Switching to regular upsert...".format(salesforce_object=salesforce_object, error=e))
+                upsert_obj = self.sf.__getattr__('{salesforce_object}'.format(salesforce_object=salesforce_object))
+                for record in batch:
+                    try:
+                        external_id = record.get(external_id_field.lower())
+                        record.pop(external_id_field.lower())
+                        result = upsert_obj.upsert('{external_id_field}/{external_id}'.format(external_id_field=external_id_field, external_id=external_id), record)
+                        self.log.info(result)
+                    except Exception as e:
+                        self.log.error("Error upserting to {salesforce_object}! Error: {error}".format(salesforce_object=salesforce_object, error=e))
+                        self.log.error("Error record: {record}".format(record=record[external_id_field]))
+
+
+        return self.log.info("{records_length} record(s) bulk upserted to {salesforce_object}".format(records_length=len(records), salesforce_object=salesforce_object))
 
     def make_query(self, query):
         """

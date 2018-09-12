@@ -21,6 +21,7 @@
 import datetime
 from sqlalchemy import text
 from ast import literal_eval
+import ipdb
 
 # Airflow Base Classes
 from airflow.models import BaseOperator
@@ -31,7 +32,7 @@ from airflow.hooks.postgres_hook import PostgresHook
 from salesforce_plugin.hooks.salesforce_hook import SalesforceHook
 from airflow.hooks.S3_hook import S3Hook
 
-class SalesforceUpsertOperator(BaseOperator):
+class SalesforceBulkUpsertOperator(BaseOperator):
     """
     Executes a query from S3 and upserts the results to Salesforce
     :param salesforce_object: Salesforce object to perform upsert on
@@ -76,7 +77,7 @@ class SalesforceUpsertOperator(BaseOperator):
             lookup_mapping={},
             sql_params={},
             *args, **kwargs):
-        super(SalesforceUpsertOperator, self).__init__(*args, **kwargs)
+        super(SalesforceBulkUpsertOperator, self).__init__(*args, **kwargs)
         self.salesforce_object = salesforce_object
         self.upsert_field = upsert_field
         self.query_s3_bucket = query_s3_bucket
@@ -128,6 +129,6 @@ class SalesforceUpsertOperator(BaseOperator):
             records.append(row_dict)
         con.close()
 
-        self.log.info("Upsert operation on {salesforce_object} beginning...".format(salesforce_object=self.salesforce_object))
-        self.salesforce.upsert(self.salesforce_object, self.upsert_field, records)
-        self.log.info("Upsert operation on {salesforce_object} complete!".format(salesforce_object=self.salesforce_object))
+        self.log.info("Bulk upsert operation on {salesforce_object} beginning...".format(salesforce_object=self.salesforce_object))
+        self.salesforce.bulk_upsert(self.salesforce_object, self.upsert_field, records)
+        self.log.info("Bulk upsert operation on {salesforce_object} complete!".format(salesforce_object=self.salesforce_object))
