@@ -1,6 +1,6 @@
 # Plugin - Salesforce
 
-This plugin retrieves provides an interface to the [REST API](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/) and [Bulk API](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/asynch_api_intro.htm)
+This plugin retrieves provides an interface to the Salesforce [REST API](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/) and [Bulk API](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/asynch_api_intro.htm)
 
 ## Hooks
 ### SalesforceHook
@@ -14,7 +14,7 @@ contrib library (https://github.com/apache/incubator-airflow/blob/master/airflow
 [Core Airflow PostgresHook](https://pythonhosted.org/airflow/_modules/postgres_hook.html).
 
 ## Operators
-### SalesforceUpsertOperator and SaleseforceBulkUpsertOperator
+### SalesforceUpsertOperator and SalesforceBulkUpsertOperator
 This operator retrieves SQL from S3, runs the code on a specified Postgres DB, and then upserts the results to a specified Salesforce object. The upsert operator
 uses the REST API and the bulk operator uses the Bulk API. The parameters it can accept include the following:
 
