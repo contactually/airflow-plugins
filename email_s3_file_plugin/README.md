@@ -19,5 +19,6 @@ This operator sends a customized email from the configured SMTP backend and appe
 - `aws_conn_id`         The Airflow connection ID for AWS.
 - `cc`					List of email addresses to CC.
 - `bcc`					List of email addresses to BCC.
+- `attachment_extension`Suffix for filename. e.g. .csv, .txt, etc.
 - `mime_subtype`		MIME subtype.
 - `mime_chartype`		Character set parameter added to the Content-Type header.
