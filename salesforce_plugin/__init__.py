@@ -5,7 +5,7 @@ from salesforce_plugin.operators.salesforce_upsert_operator import SalesforceUps
 from salesforce_plugin.operators.salesforce_bulk_upsert_operator import SalesforceBulkUpsertOperator
 
 class SalesforcePlugin(AirflowPlugin):
-    name = "SalesforcePlugin"
+    name = "salesforce_plugin"
     operators = [SalesforceUpsertOperator, SalesforceBulkUpsertOperator]
     hooks = [SalesforceHook]
     # Leave in for explicitness even if not using
