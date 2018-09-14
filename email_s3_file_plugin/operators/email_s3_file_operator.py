@@ -100,7 +100,7 @@ class EmailS3FileOperator(BaseOperator):
         self.mime_charset = mime_charset
 
     def execute(self, context):
-        s3_hook = S3Hook('S3AirflowConn')
+        s3_hook = S3Hook(self.aws_conn_id)
         file_list = s3_hook.list_keys(
             bucket_name=self.s3_bucket,
             prefix=self.s3_key,
