@@ -21,6 +21,9 @@
 import zeep
 from datetime import datetime,timedelta
 from dateutil import tz
+from collections import OrderedDict
+
+import ipdb
 
 # Airflow Base Classes
 from airflow.models import BaseOperator
@@ -101,8 +104,13 @@ class ZuoraToRedshiftOperator(BaseOperator):
             value_array = []
             if not self.use_rest_api:
                 record = zeep.helpers.serialize_object(record, target_cls=dict)
-            for _key, value in record.items():
-                if _key.lower() not in [x.lower() for x in self.field_list]:
+
+            ordered_record = OrderedDict()
+            for field in self.field_list:
+                ordered_record[field] = record[field]
+
+            for _key, value in ordered_record.items():
+                if _key not in self.field_list:
                     continue
                 elif isinstance(value, int) or isinstance(value, float):
                     value_array.append(str(value))
