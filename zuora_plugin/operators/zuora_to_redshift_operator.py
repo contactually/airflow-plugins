@@ -84,56 +84,57 @@ class ZuoraToRedshiftOperator(BaseOperator):
         self.autocommit = autocommit
 
     def execute(self, context):
-        redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
+        print(self.zuora_soap_wsdl)
+        # redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
         
-        if self.use_rest_api:
-            zuora = ZuoraRestHook(zuora_conn_id=self.zuora_conn_id)
-        else:
-            zuora = ZuoraSoapHook(zuora_conn_id=self.zuora_conn_id, wsdl_url=self.zuora_soap_wsdl)
+        # if self.use_rest_api:
+        #     zuora = ZuoraRestHook(zuora_conn_id=self.zuora_conn_id)
+        # else:
+        #     zuora = ZuoraSoapHook(zuora_conn_id=self.zuora_conn_id, wsdl_url=self.zuora_soap_wsdl)
 
-        self.log.info("Generating Zuora payload...")
-        payload = zuora.query(self.zuora_query)
-        create_staging_temp = "create temp table staging (like {target});".format(target=self.target_table)
-        utc = tz.gettz('UTC')
+        # self.log.info("Generating Zuora payload...")
+        # payload = zuora.query(self.zuora_query)
+        # create_staging_temp = "create temp table staging (like {target});".format(target=self.target_table)
+        # utc = tz.gettz('UTC')
 
-        insert_array = []
-        for record in payload:
-            value_array = []
-            if not self.use_rest_api:
-                record = zeep.helpers.serialize_object(record, target_cls=dict)
-            for _key, value in record.items():
-                if _key.lower() not in [x.lower() for x in self.field_list]:
-                    continue
-                elif isinstance(value, int) or isinstance(value, float):
-                    value_array.append(str(value))
-                elif isinstance(value, list):
-                    if not value:
-                        value_array.append('NULL')
-                    else:
-                        value = "'{value}'".format(value=",".join(value).replace("'", ""))
-                        value_array.append(value)
-                elif isinstance(value, datetime):
-                    value = "'{value}'".format(value=value.astimezone(utc).strftime("%Y-%m-%d %H:%M:%S"))
-                    value_array.append(value)
-                else:
-                    if not value:
-                        value_array.append('NULL')
-                    else:
-                        value = "'{value}'".format(value=str(value).replace("'",""))
-                        value_array.append(value)
-            insert_value = "({insert_value})".format(insert_value=",".join(value_array))
-            insert_array.append(insert_value)
-        insert_string = ",".join(insert_array)
-        insert_staging_temp = "insert into staging values {insert_string};".format(insert_string=insert_string)
+        # insert_array = []
+        # for record in payload:
+        #     value_array = []
+        #     if not self.use_rest_api:
+        #         record = zeep.helpers.serialize_object(record, target_cls=dict)
+        #     for _key, value in record.items():
+        #         if _key.lower() not in [x.lower() for x in self.field_list]:
+        #             continue
+        #         elif isinstance(value, int) or isinstance(value, float):
+        #             value_array.append(str(value))
+        #         elif isinstance(value, list):
+        #             if not value:
+        #                 value_array.append('NULL')
+        #             else:
+        #                 value = "'{value}'".format(value=",".join(value).replace("'", ""))
+        #                 value_array.append(value)
+        #         elif isinstance(value, datetime):
+        #             value = "'{value}'".format(value=value.astimezone(utc).strftime("%Y-%m-%d %H:%M:%S"))
+        #             value_array.append(value)
+        #         else:
+        #             if not value:
+        #                 value_array.append('NULL')
+        #             else:
+        #                 value = "'{value}'".format(value=str(value).replace("'",""))
+        #                 value_array.append(value)
+        #     insert_value = "({insert_value})".format(insert_value=",".join(value_array))
+        #     insert_array.append(insert_value)
+        # insert_string = ",".join(insert_array)
+        # insert_staging_temp = "insert into staging values {insert_string};".format(insert_string=insert_string)
 
-        sql_query = """
-        {create_staging_temp}
-        {insert_staging_temp}
-        delete from {target} using staging where {target}.{primary_key} = staging.{primary_key};
-        insert into {target} select * from staging;
-        drop table staging;
-        """.format(create_staging_temp=create_staging_temp, insert_staging_temp=insert_staging_temp, target=self.target_table, primary_key=self.primary_key)
+        # sql_query = """
+        # {create_staging_temp}
+        # {insert_staging_temp}
+        # delete from {target} using staging where {target}.{primary_key} = staging.{primary_key};
+        # insert into {target} select * from staging;
+        # drop table staging;
+        # """.format(create_staging_temp=create_staging_temp, insert_staging_temp=insert_staging_temp, target=self.target_table, primary_key=self.primary_key)
 
-        self.log.info("Beginning Redshift upsert...")
-        redshift.run(sql_query, self.autocommit)
-        self.log.info("Redshift upsert complete to {target_table}!".format(target_table=self.target_table))
+        # self.log.info("Beginning Redshift upsert...")
+        # redshift.run(sql_query, self.autocommit)
+        # self.log.info("Redshift upsert complete to {target_table}!".format(target_table=self.target_table))
