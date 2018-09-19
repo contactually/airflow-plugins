@@ -1,6 +1,6 @@
 # Plugin - Zuora
 
-This plugin provides an interface to the Zuora [REST API](https://www.zuora.com/developer/api-reference/) via the zuora_restful_python [package](https://github.com/bolaurent/zuora_restful_python) or to the Zuora [SOAP API](https://knowledgecenter.zuora.com/DC_Developers/G_SOAP_API) via the zeep package.
+This plugin provides an interface to the Zuora [REST API](https://www.zuora.com/developer/api-reference/) via the `zuora_restful_python` [package](https://github.com/bolaurent/zuora_restful_python) or to the Zuora [SOAP API](https://knowledgecenter.zuora.com/DC_Developers/G_SOAP_API) via the `zeep` [package](https://python-zeep.readthedocs.io/en/master/).
 
 ## Hooks
 ### ZuoraRestHook
