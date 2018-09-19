@@ -23,8 +23,6 @@ from datetime import datetime,timedelta
 from dateutil import tz
 from collections import OrderedDict
 
-import ipdb
-
 # Airflow Base Classes
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
