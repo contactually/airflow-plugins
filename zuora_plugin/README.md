@@ -23,3 +23,19 @@ This operator runs ZOQL in Zuora's backed via the REST API or SOAP API and then 
 - `use_rest_api`  		Boolean to define whether to use the REST API (true) or SOAP API (false).
 - `zuora_soap_wsdl`     Absolute path to the Zuora WSDL.
 - `autocommit`     		Option to make sure the database commits the transactions submitted automatically.
+
+### ZuoraBillRunOperator
+This operator creates a bill run according to the parameters passed. The parameters it can accept include the following:
+- `zuora_conn_id`						Connection ID for Zuora
+- `invoice_date`						Date of invoice in format 'YYYY-MM-DD'
+- `target_date`							Target date in format 'YYYY-MM-DD'
+- `execute_on_day`						Day to create bill run. Use '*' for every day, an integer for day of the month, or 'Last Day of Month'
+- `execute_on_timezone`					Timezone value used to check whether to create bill run on that day
+- `account_id`							Zuora account ID if bill run is for one account (optional)
+- `auto_email`							Tells Zuora whether to automatically email invoices after bill run is posted
+- `auto_post`							Tells Zuora whether to automatically post invoices after bill run is created
+- `auto_renewal`						Tells Zuora whether to automatically renew subscription after bill run is created
+- `batch`								Batch ID for Zuora bill run (required if account_id not passed)
+- `bill_cycle_day`						Which bill cycle days to include in bill run
+- `charge_type_to_exclude`				Which charge types to exclude from bill run
+- `no_email_for_zero_amount_invoice`	Whether to email zero balance invoice customers
