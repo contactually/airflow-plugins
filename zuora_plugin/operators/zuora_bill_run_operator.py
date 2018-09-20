@@ -133,7 +133,7 @@ class ZuoraBillRunOperator(BaseOperator):
             last_day_of_month = calendar.monthrange(current_date.year, current_date.month)[1]
             run_operator = True if current_date.day == last_day_of_month else False
         else:
-            return self.log.error("Invalid execute_on_day parameter: {execute_on_day}".format(execute_on_day=run_day))
+            self.log.error("Invalid execute_on_day parameter: {execute_on_day}".format(execute_on_day=run_day))
 
         return run_operator
 
