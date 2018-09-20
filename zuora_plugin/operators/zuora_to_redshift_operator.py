@@ -97,6 +97,9 @@ class ZuoraToRedshiftOperator(BaseOperator):
         create_staging_temp = "create temp table staging (like {target});".format(target=self.target_table)
         utc = tz.gettz('UTC')
 
+        if not payload[0]['Id'] and len(payload) == 1:
+            return self.log.info('No records needed to be updated!')
+
         insert_array = []
         for record in payload:
             value_array = []
