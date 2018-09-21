@@ -31,7 +31,7 @@ from zuora_plugin.hooks.zuora_rest_hook import ZuoraRestHook
 
 class ZuoraCancelDelinquentCustomerOperator(BaseOperator):
     """
-    Runs ZOQL query in Zuora and upserts results into Redshift
+    Determines delinquent customers and cancels their subscriptions. Also deals with credit balance and invoice adjustments as necessary
     :param zuora_conn_id: connection ID for Zuora
     :type zuora_conn_id: string
     :param target_date: target date in format 'YYYY-MM-DD'
