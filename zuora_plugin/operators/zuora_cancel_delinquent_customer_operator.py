@@ -55,8 +55,6 @@ class ZuoraCancelDelinquentCustomerOperator(BaseOperator):
     def execute(self, context):
         client = ZuoraRestHook(self.zuora_conn_id)
 
-        import ipdb
-
         delinquent_subscriptions = self.determine_delinquent_customers(client)
         for subscription in delinquent_subscriptions:
             cancel_date = self.determine_cancellation_date(subscription)
