@@ -20,8 +20,10 @@
 
 # Widely Available Packages -- if it's a core Python package or on PyPi, put it here.
 from zuora_restful_python.zuora import Zuora
+from io import StringIO
 import json
 import time
+import csv
 
 # Airflow Base Classes
 from airflow.utils.log.logging_mixin import LoggingMixin
@@ -60,13 +62,12 @@ class ZuoraRestHook(BaseHook, LoggingMixin):
 
     def sign_in(self):
         """
-        Sign into Salesforce.
+        Sign into Zuora.
         If we have already signed it, this will just return the original object
         """
         if hasattr(self, 'z'):
             return self.z
 
-        # connect to Salesforce
         z = Zuora(
             username=self.connection.login,
             password=self.connection.password,
@@ -152,3 +153,86 @@ class ZuoraRestHook(BaseHook, LoggingMixin):
 
         result = self.z.create_bill_run(invoice_date, target_date, account_id, auto_email, auto_post, auto_renewal, batch, bill_cycle_day, charge_type_to_exclude, no_email_for_zero_amount_invoice)
         return result
+
+    def create_credit_balance_adjustment(self, payload):
+        """
+        Creates a credit balance adjustment.
+        :param payload: REST payload
+        :type payload: dictionary
+        """
+
+        self.sign_in()
+
+        result = self.z.create_credit_balance_adjustment(payload)
+        return result
+
+    def cancel_subscription(self, subscription_id, payload):
+        """
+        Creates a credit balance adjustment.
+        :param subscription_id: subscription ID for cancellation
+        :type subscription_id: string
+        :param payload: REST payload
+        :type payload: dictionary
+        """
+
+        self.sign_in()
+
+        result = self.z.cancel_subscription(subscription_id, payload)
+        return result
+
+    def query_export(self, query):
+        """
+        Creates and runs a query export.
+        :param query: ZOQL query
+        :type query: string
+        """
+
+        self.sign_in()
+
+        response = self.z.query_export(query)
+        return response
+
+    def aqua_query(self, query):
+        """
+        Creates and runs a query via the AQuA API.
+        :param query: ZOQL query
+        :type query: string
+        """
+
+        self.sign_in()
+
+        query_param = [{"name": "ZOQLQUERY",
+                        "query": query,
+                        "type": "zoqlexport"}]
+
+        payload = {"format": "csv",
+                   "name": "Example",
+                   "encrypted": "none",
+                   "useQueryLabels": "true",
+                   "dateTimeUtc": "true",
+                   "queries": query_param}
+
+        response = self.z._post("/batch-query/", payload)
+        response_status = response['status']
+
+        error_statuses = ['aborted', 'cancelled', 'error']
+        running_statuses = ['submitted', 'executing', 'pending']
+
+        status = response_status
+        if status in error_statuses:
+            return self.log.error("Error: {error_message} Query: {query}".format(error_message=response['message'], query=response['batches'][0]['query']))
+
+        check_job_path = "/batch-query/jobs/{id}".format(id=response['id'])
+
+        while status in running_statuses:
+            time.sleep(5)
+            check_response = self.z._get(check_job_path)
+            status = check_response['status']
+
+        file_id = check_response['batches'][0]['fileId']
+
+        results = self.z.get_files(file_id)
+        results = StringIO(results)
+        results = csv.DictReader(results, delimiter=",")
+
+        return results

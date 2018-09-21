@@ -62,13 +62,12 @@ class ZuoraSoapHook(BaseHook, LoggingMixin):
 
     def sign_in(self):
         """
-        Sign into Salesforce.
+        Sign into Zuora.
         If we have already signed in, this will just return the original object
         """
         if hasattr(self, 'client'):
             return self.client
 
-        # connect to Salesforce
         client = zeep.Client(wsdl=self.wsdl_url)
         response = client.service.login(
             username=self.connection.login,
