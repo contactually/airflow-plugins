@@ -41,6 +41,19 @@ This operator retrieves SQL from S3, runs the code on a specified Redshift DB an
 - `headers`				Passes a list of strings to be added to query results; must be in correct order
 						as results in SELECT statement in order to be appended correctly to result file.
 
+### S3ToRedshiftOperator
+This operator is similar to the one found in Airflow but functions for the S3 hook for Airflow v1.9. The parameters it can accept include the following:
+- `schema`				Reference to a specific schema in Redshift DB.
+- `table`				Reference to a specific table in Redshift DB.
+- `s3_bucket`			The S3 bucket where the text file is to be COPY'd from.
+- `s3_key`				The S3 key where the text file is to be COPY'd from.
+- `redshift_conn_id`	The Airflow connection ID for the Redshift DB.
+- `aws_conn_id`			The Airflow connection ID for AWS.
+- `verify`				Whether or not to verify SSL certificates for S3 connection.
+- `copy_options`		Reference to a list of COPY options
+- `autocommit`			Specifies whether DML transactions are committed upon submission.
+- `parameters`			Specifies parameters to be passed through to psycopg.
+
 ### S3QueryToRedshiftOperator
 This operator retrieves SQL from S3 and runs the code on a specified Redshift DB. The parameters it can accept include the following:
 

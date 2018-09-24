@@ -50,6 +50,10 @@ class S3ToRedshiftTransfer(BaseOperator):
     :type verify: bool or str
     :param copy_options: reference to a list of COPY options
     :type copy_options: list
+    :param autocommit: specifies whether DML transactions are committed upon submission
+    :type autocommit: bool
+    :param parameters: specifies parameters to be passed through to psycopg
+    :type: list
     """
 
     template_fields = ()
