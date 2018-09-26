@@ -23,6 +23,7 @@ import json
 import csv
 from tempfile import NamedTemporaryFile
 import os
+from collections import OrderedDict
 
 # Airflow Base Classes
 from airflow.models import BaseOperator
@@ -103,14 +104,14 @@ class S3QueryToLambdaOperator(BaseOperator):
         for row in result:
             row_list = []
             for column, value in row.items():
-                value = 0 if not isinstance(value, int) and not isinstance(value, float) else value
+                value = 0 if value == float('inf') or value == float('-inf') else value
                 row_list.append(value)
             records.append(row_list)
 
         payload = json.dumps({"input": records})
         lambda_result = self.awslambda.invoke_lambda(payload)
 
-        results = json.loads(lambda_result['Payload'].read().decode('utf-8'))
+        results = json.loads(lambda_result['Payload'].read().decode('utf-8'), object_pairs_hook=OrderedDict)
 
         f_source = NamedTemporaryFile(mode='w+t', suffix='.csv', delete=False)
         fieldnames = [k for k in results[0].keys()]
