@@ -39,3 +39,8 @@ This operator creates a bill run according to the parameters passed. The paramet
 - `bill_cycle_day`						Which bill cycle days to include in bill run
 - `charge_type_to_exclude`				Which charge types to exclude from bill run
 - `no_email_for_zero_amount_invoice`	Whether to email zero balance invoice customers
+
+### ZuoraCancelDelinquentCustomerOperator
+This operator finds delinquent customers and subsequently cancels them. It automatically calculates and applies any credit balance adjustments. The parameters it can accept include the following:
+- `zuora_conn_id`		Connection ID for Zuora
+- `target_date`			Target date in format 'YYYY-MM-DD'
