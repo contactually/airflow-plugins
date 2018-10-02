@@ -151,8 +151,28 @@ class ZuoraRestHook(BaseHook, LoggingMixin):
 
         self.sign_in()
 
-        result = self.z.create_bill_run(invoice_date, target_date, account_id, auto_email, auto_post, auto_renewal, batch, bill_cycle_day, charge_type_to_exclude, no_email_for_zero_amount_invoice)
-        return result
+        payload = {
+            'InvoiceDate': invoice_date if isinstance(invoice_date, str) else invoice_date.strftime('%Y-%m-%d'),
+            'TargetDate': target_date if isinstance(target_date, str) else target_date.strftime('%Y-%m-%d'),
+            'AutoEmail': auto_email,
+            'AutoPost': auto_post,
+            'AutoRenewal': auto_renewal,
+            'NoEmailForZeroAmountInvoice': no_email_for_zero_amount_invoice
+        }
+
+        if account_id:
+            payload['AccountId'] = account_id
+        else:
+            payload['Batch'] = batch
+            payload['BillCycleDay'] = bill_cycle_day
+
+        if charge_type_to_exclude:
+            payload['ChargeTypeToExclude'] = charge_type_to_exclude
+
+        response = self.z._post('/object/bill-run/', payload)
+        assert response['Success'], response
+
+        return response
 
     def create_credit_balance_adjustment(self, payload):
         """
