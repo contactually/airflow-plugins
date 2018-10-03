@@ -41,9 +41,11 @@ class RedshiftHook(AwsHook, LoggingMixin):
     """
     Interact with Redshift via the boto3 library.
     """
+    def __init__(self, region_name):
+        self.region_name = region_name
 
     def get_conn(self):
-        return self.get_client_type('redshift')
+        return self.get_client_type('redshift', self.region_name)
 
     def create_cluster_snapshot(self, snapshot_identifier, cluster_identifier, tags=[]):
         """
