@@ -95,15 +95,14 @@ class RedshiftHook(AwsHook, LoggingMixin):
 
         response = client.describe_cluster_snapshots(**options)
         snapshots_for_deletion = []
-        if not response['Snapshots']:
+        if response['Snapshots'] != None:
             for snapshot in response['Snapshots']:
                 snapshot_identifier = snapshot.get('SnapshotIdentifier')
                 snapshots_for_deletion.append(snapshot_identifier)
-
-        if not snapshots_for_deletion:
+        if snapshots_for_deletion != None:
             for snapshot_identifier in snapshots_for_deletion:
                 self.log.info("Deleting snapshot {snapshot}".format(snapshot=snapshot_identifier))
-                options = {"SnapshotIdentifier": snapshot_identifier, "ClusterIdentifier": cluster_identifier}
+                options = {"SnapshotIdentifier": snapshot_identifier}
                 client.delete_cluster_snapshot(**options)
 
         return self.log.info('All {type} snapshots between {start_time} and {end_time} deleted!'.format(type=snapshot_type, start_time=start_time, end_time=end_time))
