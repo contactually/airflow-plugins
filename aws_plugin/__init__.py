@@ -2,7 +2,7 @@ from airflow.plugins_manager import AirflowPlugin
 
 from aws_plugin.hooks.redshift_hook import RedshiftHook
 
-class SalesforcePlugin(AirflowPlugin):
+class AwsPlugin(AirflowPlugin):
     name = "aws_plugin"
     operators = []
     hooks = [RedshiftHook]
