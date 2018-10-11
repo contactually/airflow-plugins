@@ -48,9 +48,9 @@ class RedshiftHook(AwsHook, LoggingMixin):
     def create_cluster_snapshot(self, snapshot_identifier, cluster_identifier, tags=[]):
         """
         :param snapshot_identifier: unique identifier for the snapshot that you are requesting
-        :type snapshot_identifiier: str
+        :type snapshot_identifiier: string
         :param cluster_identifier: cluster identifier for which you want a snapshot
-        :type cluster_identifier: str
+        :type cluster_identifier: string
         :param tags: list of tag instances
         :type tags: list of dicts
         """
@@ -81,9 +81,9 @@ class RedshiftHook(AwsHook, LoggingMixin):
     def delete_cluster_snapshots(self, cluster_identifier, snapshot_type, start_time, end_time):
         """
         :param cluster_identifier: cluster identifier for which you want a snapshot
-        :type cluster_identifier: str
+        :type cluster_identifier: string
         :param snapshot_type: type of snapshot to delete
-        :type tags: str
+        :type tags: string
         :param start_time: request snapshots created at or after specified time
         :type start_time: datetime
         :param end_time: request snapshots created before specified time
@@ -106,5 +106,3 @@ class RedshiftHook(AwsHook, LoggingMixin):
                 client.delete_cluster_snapshot(**options)
 
         return self.log.info('All {type} snapshots between {start_time} and {end_time} deleted!'.format(type=snapshot_type, start_time=start_time, end_time=end_time))
-
-
