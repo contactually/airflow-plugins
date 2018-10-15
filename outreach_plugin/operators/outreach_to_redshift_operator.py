@@ -126,9 +126,6 @@ class OutreachToRedshiftOperator(BaseOperator):
                 for key in self.ordered_field_list:
                     record_payload[key] = record[key]
                 payload.append(record_payload)
-            for record in payload:
-                if len(record.keys()) != 36:
-                    self.log.info('id: {id} num_keys: {num_keys}'.format(id=record['id'], num_keys=len(record.keys())))
             self.upsert(database, payload)
 
     def obtain_oauth_credentials(self, client_id, database):
