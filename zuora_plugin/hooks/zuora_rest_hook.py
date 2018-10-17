@@ -76,6 +76,31 @@ class ZuoraRestHook(BaseHook, LoggingMixin):
         self.z = z
         return z
 
+    def get_notification_history(self, start_time, end_time, failed_only):
+        """
+        Retrieves notification history from Zuora.
+        :param start_time: start time bound for retrieving history in yyyy-MM-ddTHH:mm:ss
+        :type start_time: string
+        :param end_time: end time bound for retrieving history in yyyy-MM-ddTHH:mm:ss
+        :type end_time: string
+        :param failed_only: if true, only returns failed records
+        :type failed_only: boolean
+        """
+
+        self.sign_in()
+
+        payload = {
+            "pageSize": 40,
+            "endTime": end_time,
+            "startTime": start_time,
+            "failed_only": failed_only
+        }
+
+        result = self.z._get('/notification-history/email/', payload)
+
+        return result
+
+
     def query(self, query):
         """
         Queries Zuora and returns all records.
