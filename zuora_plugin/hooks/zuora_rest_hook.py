@@ -100,7 +100,6 @@ class ZuoraRestHook(BaseHook, LoggingMixin):
 
         return result
 
-
     def query(self, query):
         """
         Queries Zuora and returns all records.
