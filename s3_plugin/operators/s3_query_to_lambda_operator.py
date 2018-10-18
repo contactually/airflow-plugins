@@ -37,7 +37,7 @@ from airflow.contrib.hooks.aws_lambda_hook import AwsLambdaHook
 
 class S3QueryToLambdaOperator(BaseOperator):
     """
-    Reads a .sql file from S3 and executes it in Redshift
+    Executes a .sql file from S3 in Redshift, sends results to Lambda, then stores results back in S3
     :param query_s3_bucket: reference to a specific S3 bucket to retrieve sql
     :type query_s3_bucket: string
     :param query_s3_key: reference to a specific S3 key to retrieve sql

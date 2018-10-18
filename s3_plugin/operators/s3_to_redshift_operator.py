@@ -92,20 +92,25 @@ class S3ToRedshiftTransfer(BaseOperator):
         a_key, s_key, _, _ = self.s3._get_credentials(region_name=None)
         copy_options = '\n\t\t\t'.join(self.copy_options)
 
-        copy_query = """
-            COPY {schema}.{table}
-            FROM 's3://{s3_bucket}/{s3_key}'
-            with credentials
-            'aws_access_key_id={access_key};aws_secret_access_key={secret_key}'
-            {copy_options};
-        """.format(schema=self.schema,
-                   table=self.table,
-                   s3_bucket=self.s3_bucket,
-                   s3_key=self.s3_key,
-                   access_key=a_key,
-                   secret_key=s_key,
-                   copy_options=copy_options)
+        file_exists = self.s3.check_for_key(key=self.s3_key, bucket_name=self.s3_bucket)
 
-        self.log.info('Executing COPY command...')
-        self.hook.run(copy_query, self.autocommit)
-        self.log.info("COPY command complete...")
+        if file_exists:
+            copy_query = """
+                COPY {schema}.{table}
+                FROM 's3://{s3_bucket}/{s3_key}'
+                with credentials
+                'aws_access_key_id={access_key};aws_secret_access_key={secret_key}'
+                {copy_options};
+            """.format(schema=self.schema,
+                       table=self.table,
+                       s3_bucket=self.s3_bucket,
+                       s3_key=self.s3_key,
+                       access_key=a_key,
+                       secret_key=s_key,
+                       copy_options=copy_options)
+
+            self.log.info("Executing COPY command...")
+            self.hook.run(copy_query, self.autocommit)
+            self.log.info("COPY command complete...")
+        else:
+            self.log.info("No file exists to COPY!")

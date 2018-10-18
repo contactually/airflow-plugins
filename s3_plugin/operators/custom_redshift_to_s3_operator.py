@@ -30,7 +30,7 @@ from airflow.hooks.S3_hook import S3Hook
 
 class CustomRedshiftToS3Operator(BaseOperator):
     """
-    Executes an UNLOAD command to s3 as a CSV with headers
+    Executes a .sql query from S3 in Redshift in an UNLOAD command back to S3
     :param query_s3_bucket: reference to a specific S3 bucket to retrieve sql
     :type query_s3_bucket: string
     :param query_s3_key: reference to a specific S3 key to retrieve sql
