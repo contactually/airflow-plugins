@@ -65,7 +65,7 @@ This operator retrieves SQL from S3 and runs the code on a specified Redshift DB
 - `autocommit`        	Passes boolean to tell Redshift to autocommit after running the query.
 
 ###S3QueryToLambdaOperator
-This operator reads SQL from S3, runs the code on a specified Redshift DB, submits the query results to a Lambda function, and converts the response to a csv stored back in a specified S3 location. The Lambda function must return a list of dictionaries in order to parse the response into a csv format.
+This operator reads SQL from S3, runs the code on a specified Redshift DB, submits the query results to a Lambda function, and converts the response to a csv stored back in a specified S3 location. The Lambda function must return a list of dictionaries in order to parse the response into a csv format. The parameters it can accept include the following:
 
 - `query_s3_bucket`     The S3 bucket where the .sql file is stored.
 - `query_s3_key`        The S3 key where the .sql file is stored.
@@ -75,3 +75,16 @@ This operator reads SQL from S3, runs the code on a specified Redshift DB, submi
 - `aws_region`			AWS region.
 - `redshift_conn_id`	The Airflow connection ID for the Redshift DB.
 - `aws_conn_id`			The Airflow connection ID for AWS.
+
+###UpsertS3FileToRedshiftOperator
+This operator reads a delimited file from S3 and upserts the contents to a Redshift table. The headers must appear in order in the first row of the delimited file. The parameters it can accept include the following:
+
+- `s3_bucket`     		The S3 bucket where the delimited file is stored.
+- `s3_key`        		The S3 key where the delimited file is stored.
+- `file_delimiter`      File delimiter.
+- `target_table`        Target table to upsert data to.
+- `primary_key`			Primary key to use in upsert operation.
+- `redshift_conn_id`	The Airflow connection ID for the Redshift DB.
+- `aws_conn_id`			The Airflow connection ID for AWS.
+- `aws_region`			AWS region.
+- `autocommit`        	Passes boolean to tell Redshift to autocommit after running the query.
