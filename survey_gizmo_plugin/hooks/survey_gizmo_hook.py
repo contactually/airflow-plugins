@@ -159,7 +159,7 @@ class SurveyGizmoHook(BaseHook, LoggingMixin):
                             response_dict['question_id'] = value['id']
                             response_dict['option_id'] = v['id']
                             response_dict['answer_text'] = value.get('answer')
-                            response_dict['submitted_at'] = parser.parse(response['date_submitted']).astimezone(utc).strftime("%Y-%m-%d %H:%M:%S") if response.get('date_submitted') else None
+                            response_dict['submitted_at'] = parser.parse(response['date_submitted']).strftime("%Y-%m-%d %H:%M:%S") if response.get('date_submitted') else None
                             payload.append(response_dict)
                     else:
                         response_dict = OrderedDict()
@@ -169,7 +169,7 @@ class SurveyGizmoHook(BaseHook, LoggingMixin):
                         response_dict['question_id'] = value['id']
                         response_dict['option_id'] = None
                         response_dict['answer_text'] = value.get('answer')
-                        response_dict['submitted_at'] = parser.parse(response['date_submitted']).astimezone(utc).strftime("%Y-%m-%d %H:%M:%S") if response.get('date_submitted') else None
+                        response_dict['submitted_at'] = parser.parse(response['date_submitted']).strftime("%Y-%m-%d %H:%M:%S") if response.get('date_submitted') else None
                         payload.append(response_dict)
 
             total_pages = responses['total_pages']
