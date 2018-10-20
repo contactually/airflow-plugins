@@ -21,7 +21,7 @@
 # Widely Available Packages -- if it's a core Python package or on PyPi, put it here.
 from surveygizmo import SurveyGizmo
 from datetime import datetime, timedelta
-from dateutil import tz
+from dateutil import tz, parser
 from collections import OrderedDict
 import json
 
@@ -140,6 +140,7 @@ class SurveyGizmoHook(BaseHook, LoggingMixin):
         else:
             responses = self.gizmo.api.surveyresponse
 
+        utc = tz.gettz('UTC')
         page = 1
         total_pages = 1
         payload = []
@@ -158,7 +159,7 @@ class SurveyGizmoHook(BaseHook, LoggingMixin):
                             response_dict['question_id'] = value['id']
                             response_dict['option_id'] = v['id']
                             response_dict['answer_text'] = value.get('answer')
-                            response_dict['submitted_at'] = datetime.strptime(response['date_submitted'], '%Y-%m-%d %H:%M:%S %Z') if response.get('date_submitted') else None
+                            response_dict['submitted_at'] = parser.parse(response['date_submitted']).astimezone(utc).strftime("%Y-%m-%d %H:%M:%S") if response.get('date_submitted') else None
                             payload.append(response_dict)
                     else:
                         response_dict = OrderedDict()
@@ -168,7 +169,7 @@ class SurveyGizmoHook(BaseHook, LoggingMixin):
                         response_dict['question_id'] = value['id']
                         response_dict['option_id'] = None
                         response_dict['answer_text'] = value.get('answer')
-                        response_dict['submitted_at'] = datetime.strptime(response['date_submitted'], '%Y-%m-%d %H:%M:%S %Z') if response.get('date_submitted') else None
+                        response_dict['submitted_at'] = parser.parse(response['date_submitted']).astimezone(utc).strftime("%Y-%m-%d %H:%M:%S") if response.get('date_submitted') else None
                         payload.append(response_dict)
 
             total_pages = responses['total_pages']
