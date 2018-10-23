@@ -64,7 +64,7 @@ This operator retrieves SQL from S3 and runs the code on a specified Redshift DB
 - `aws_conn_id`         The Airflow connection ID for AWS.
 - `autocommit`        	Passes boolean to tell Redshift to autocommit after running the query.
 
-###S3QueryToLambdaOperator
+### S3QueryToLambdaOperator
 This operator reads SQL from S3, runs the code on a specified Redshift DB, submits the query results to a Lambda function, and converts the response to a csv stored back in a specified S3 location. The Lambda function must return a list of dictionaries in order to parse the response into a csv format. The parameters it can accept include the following:
 
 - `query_s3_bucket`     The S3 bucket where the .sql file is stored.
@@ -76,7 +76,7 @@ This operator reads SQL from S3, runs the code on a specified Redshift DB, submi
 - `redshift_conn_id`	The Airflow connection ID for the Redshift DB.
 - `aws_conn_id`			The Airflow connection ID for AWS.
 
-###UpsertS3FileToRedshiftOperator
+### UpsertS3FileToRedshiftOperator
 This operator reads a delimited file from S3 and upserts the contents to a Redshift table. The headers must appear in order in the first row of the delimited file. The parameters it can accept include the following:
 
 - `s3_bucket`     		The S3 bucket where the delimited file is stored.
