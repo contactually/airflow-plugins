@@ -211,26 +211,29 @@ class GoToWebinarToRedshiftOperator(BaseOperator):
         return access_token
 
     def upsert(self, database, payload, target_table, primary_key):
-        logging.info('Upserting {payload} records into {target_table}.'.format(payload=len(payload), target_table=target_table))
-        engine = database.get_sqlalchemy_engine()
-        con = engine.connect() 
+        if payload:
+            logging.info('Upserting {payload} records into {target_table}.'.format(payload=len(payload), target_table=target_table))
+            engine = database.get_sqlalchemy_engine()
+            con = engine.connect() 
 
-        temp_table_string = 'create temp table staging (like {target_table});'.format(target_table=target_table)
-        insert_string = self.create_insert_string(payload)
-        insert_string = 'insert into staging values {insert_string};'.format(insert_string=insert_string)
-        upsert_string = """
-        delete from {target_table} using staging
-        where {target_table}.{primary_key} = staging.{primary_key};
-        insert into {target_table} select * from staging;
-        drop table staging;
-        """.format(target_table=target_table, primary_key=primary_key)
+            temp_table_string = 'create temp table staging (like {target_table});'.format(target_table=target_table)
+            insert_string = self.create_insert_string(payload)
+            insert_string = 'insert into staging values {insert_string};'.format(insert_string=insert_string)
+            upsert_string = """
+            delete from {target_table} using staging
+            where {target_table}.{primary_key} = staging.{primary_key};
+            insert into {target_table} select * from staging;
+            drop table staging;
+            """.format(target_table=target_table, primary_key=primary_key)
 
-        query = temp_table_string + insert_string + upsert_string
+            query = temp_table_string + insert_string + upsert_string
 
-        result = con.execute(text(query))
-        result.close()
+            result = con.execute(text(query))
+            result.close()
 
-        logging.info('Upsert complete!')
+            logging.info('Upsert complete!')
+        else:
+            logging.info('No records to upsert!')
 
     def create_insert_string(self, payload):
         insert_array = []
