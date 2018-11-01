@@ -36,7 +36,7 @@ from airflow.hooks.S3_hook import S3Hook
 
 class UpsertS3FileToRedshiftOperator(BaseOperator):
     """
-    Executes a .sql query from S3 in Redshift in an UNLOAD command back to S3
+    Upserts a text file from S3 into a specified Redshift table
     :param s3_bucket: reference to a specific S3 bucket to retrieve file
     :type s3_bucket: string
     :param s3_key: reference to a specific S3 key to retrieve file
