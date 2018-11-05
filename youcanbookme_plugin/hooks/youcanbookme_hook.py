@@ -68,7 +68,6 @@ class YoucanbookmeHook(BaseHook, LoggingMixin):
                                  headers=headers)
         return json.loads(response.text)
 
-
     def retrieve_profiles(self, fields):
         auth = HTTPBasicAuth(self.username, self.password)
         base_url = 'https://api.youcanbook.me/v1/'
