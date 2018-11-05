@@ -92,18 +92,25 @@ class HubspotHook(BaseHook, LoggingMixin):
         batchsize = 100
         params = {'hapikey': self.api_key}
 
-        self.log.info("Batch upserting {payload_size} contacts...".format(payload_size=len(hubspot_payload)))
+        self.log.info("Batch upserting {payload_size} contact(s)...".format(payload_size=len(hubspot_payload)))
         for i in range(0, len(hubspot_payload), batchsize):
             batch = hubspot_payload[i:i+batchsize]
             path = self.base_url + 'contact/batch/'
             self.log.info("Posting contacts {begin_batch} thru {end_batch}".format(begin_batch=i+1, end_batch=i+100 if i+100 < len(hubspot_payload) else len(hubspot_payload)))
             response = self._post(path, params=params, payload=batch)
 
+            if response.status_code == 400 and json.loads(response.text).get('invalidEmails'):
+                error_message = json.loads(response.text)
+                invalid_emails = error_message.get('invalidEmails')
+                batch = [record for record in batch if record['email'] not in invalid_emails]
+                response = self._post(path, params=params, payload=batch)
+
             if response.status_code != 202:
-                self.log.info("Batch upsert failed, switching to individual upsert...")
+                self.log.info("Batch upsert failed! \n Error message: {message} \n Switching to individual upsert...".format(message=response.text))
                 for record in batch:
                     path = self.base_url + "contact/createOrUpdate/email/{email}".format(email=record['email'])
                     response = self._post(path, params=params, payload=batch)
+
                     if response.status_code == 200:
                         self.log.info("Upserted {record}".format(record=record))
                     else:
