@@ -72,13 +72,43 @@ class HubspotHook(BaseHook, LoggingMixin):
                                    params=params)
         return response
 
+    def get_contacts_from_list(self, list_id, extra_params=None):
+        self.log.info("Fetching all contacts from list {list_id}".format(list_id=list_id))
+        path = self.base_url + "lists/{list_id}/contacts/all".format(list_id=list_id)
+        params = {'hapikey': self.api_key}
+        if extra_params:
+            params = {**params, **extra_params}
+
+        response = self._get(path, params=params)
+        response = json.loads(response.text)
+        contact_list = []
+
+        contact_list = contact_list + response.get('contacts')
+        if len(contact_list) == 0:
+            return contact_list
+
+        vid_offset = response['vid-offset']
+        while vid_offset != 0:
+            params['vidOffset'] = vid_offset
+            response = self._get(path, params=params)
+            response = json.loads(response.text)
+            contact_list = contact_list + response['contacts']
+            vid_offset = response['vid-offset']
+
+        return contact_list
+
     def delete_contacts(self, payload):
+        self.log.info("Deleting {payload} contacts...".format(payload=len(payload)))
         for record in payload:
             contact_id = record['contact_id']
-            path = self.base_url + 'contact/vid/{contact_id}'.format(contact_id=contact_id)
+            path = self.base_url + "contact/vid/{contact_id}".format(contact_id=contact_id)
             response = self._delete(path)
-            if not response.get('deleted'):
-                self.log.error("Contact failed to delete with status {status_code} and error {message}".format(status_code=response.status_code, message=response.text))
+            try:
+                response = json.loads(response.text)
+                if not response.get('deleted'):
+                    self.log.error("Contact failed to delete with error {message}".format(message=response))
+            except:
+                import ipdb; ipdb.set_trace()
 
         return self.log.info("Delete contacts completed!")
 
