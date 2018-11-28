@@ -75,6 +75,7 @@ This operator reads SQL from S3, runs the code on a specified Redshift DB, submi
 - `aws_region`			AWS region.
 - `redshift_conn_id`	The Airflow connection ID for the Redshift DB.
 - `aws_conn_id`			The Airflow connection ID for AWS.
+- `batch_size`			Batch size to send to Lambda
 
 ### UpsertS3FileToRedshiftOperator
 This operator reads a delimited file from S3 and upserts the contents to a Redshift table. The headers must appear in order in the first row of the delimited file. The parameters it can accept include the following:

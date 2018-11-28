@@ -54,6 +54,8 @@ class S3QueryToLambdaOperator(BaseOperator):
     :type redshift_conn_id: string
     :param aws_conn_id: reference to a specific S3 connection
     :type aws_conn_id: string
+    :param batch_size: size of batches to submit to Lambda
+    :type batch_size: int
     """
 
     template_fields = ()
@@ -71,6 +73,7 @@ class S3QueryToLambdaOperator(BaseOperator):
             aws_region,
             redshift_conn_id='redshift_default',
             aws_conn_id='aws_default',
+            batch_size=100,
             *args, **kwargs):
         super(S3QueryToLambdaOperator, self).__init__(*args, **kwargs)
         self.query_s3_bucket = query_s3_bucket
@@ -81,6 +84,7 @@ class S3QueryToLambdaOperator(BaseOperator):
         self.aws_region = aws_region
         self.redshift_conn_id = redshift_conn_id
         self.aws_conn_id = aws_conn_id
+        self.batch_size = batch_size
 
     def execute(self, context):
         self.database = PostgresHook(postgres_conn_id=self.redshift_conn_id)
@@ -108,20 +112,27 @@ class S3QueryToLambdaOperator(BaseOperator):
                 row_list.append(value)
             records.append(row_list)
 
-        payload = json.dumps({"input": records})
-        lambda_result = self.awslambda.invoke_lambda(payload)
-
-        results = json.loads(lambda_result['Payload'].read().decode('utf-8'), object_pairs_hook=OrderedDict)
+        full_results = []
+        for batch in self.batch(iterable=records, n=self.batch_size):
+            payload = json.dumps({"input": batch})
+            lambda_result = self.awslambda.invoke_lambda(payload)
+            results = json.loads(lambda_result['Payload'].read().decode('utf-8'), object_pairs_hook=OrderedDict)
+            full_results = full_results + results
 
         f_source = NamedTemporaryFile(mode='w+t', suffix='.csv', delete=False)
-        fieldnames = [k for k in results[0].keys()]
+        fieldnames = [k for k in full_results[0].keys()]
         writer = csv.DictWriter(f_source, fieldnames=fieldnames, delimiter='|')
 
         writer.writeheader()
-        for row in results:
+        for row in full_results:
             writer.writerow(row)
         
         f_source.close()   
         self.s3.load_file(filename=f_source.name, key=self.dest_s3_key, bucket_name=self.dest_s3_bucket, replace=True)
         self.log.info("File loaded to S3.")
         os.remove(f_source.name)
+
+    def batch(self, iterable, n=1):
+        l = len(iterable)
+        for ndx in range(0, l, n):
+            yield iterable[ndx:min(ndx + n, l)]
