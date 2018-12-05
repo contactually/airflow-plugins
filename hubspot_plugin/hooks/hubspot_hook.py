@@ -83,7 +83,7 @@ class HubspotHook(BaseHook, LoggingMixin):
         response = json.loads(response.text)
         contact_list = []
 
-        contact_list = contact_list + response.get('contacts', '')
+        contact_list = contact_list + response.get('contacts', [])
         if len(contact_list) == 0:
             return contact_list
 
