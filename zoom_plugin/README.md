@@ -7,8 +7,8 @@ This plugin provides an interface to the Zoom.us [REST API](https://zoom.github.
 This hook handles the authentication and request to Zoom. It can be used to call several methods from the API.
 
 ## Operators
-### ZoomToRedshiftOperator
-This operator will pull data from a resource and push it back to a Redshift table. The parameters it can accept include the following:
+### ZoomWebinarToRedshiftOperator
+This operator will pull data from the webinar API endpoints and upsert it to Redshift. The parameters it can accept include the following:
 
 - `user_id`   			Reference to the user ID to retrieve data from that account.
 - `schema`		        Schema to upsert records to.
