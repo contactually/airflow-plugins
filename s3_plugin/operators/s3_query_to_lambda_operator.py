@@ -119,18 +119,21 @@ class S3QueryToLambdaOperator(BaseOperator):
             results = json.loads(lambda_result['Payload'].read().decode('utf-8'), object_pairs_hook=OrderedDict)
             full_results = full_results + results
 
-        f_source = NamedTemporaryFile(mode='w+t', suffix='.csv', delete=False)
-        fieldnames = [k for k in full_results[0].keys()]
-        writer = csv.DictWriter(f_source, fieldnames=fieldnames, delimiter='|')
+        if full_results:
+            f_source = NamedTemporaryFile(mode='w+t', suffix='.csv', delete=False)
+            fieldnames = [k for k in full_results[0].keys()]
+            writer = csv.DictWriter(f_source, fieldnames=fieldnames, delimiter='|')
 
-        writer.writeheader()
-        for row in full_results:
-            writer.writerow(row)
-        
-        f_source.close()   
-        self.s3.load_file(filename=f_source.name, key=self.dest_s3_key, bucket_name=self.dest_s3_bucket, replace=True)
-        self.log.info("File loaded to S3.")
-        os.remove(f_source.name)
+            writer.writeheader()
+            for row in full_results:
+                writer.writerow(row)
+            
+            f_source.close()   
+            self.s3.load_file(filename=f_source.name, key=self.dest_s3_key, bucket_name=self.dest_s3_bucket, replace=True)
+            self.log.info("File loaded to S3.")
+            os.remove(f_source.name)
+        else:
+            logging.info("No records found, nothing to send to Lambda!")
 
     def batch(self, iterable, n=1):
         l = len(iterable)
