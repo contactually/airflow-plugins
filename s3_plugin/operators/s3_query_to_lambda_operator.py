@@ -133,7 +133,7 @@ class S3QueryToLambdaOperator(BaseOperator):
             self.log.info("File loaded to S3.")
             os.remove(f_source.name)
         else:
-            logging.info("No records found, nothing to send to Lambda!")
+            self.log.info("No records found, nothing to send to Lambda!")
 
     def batch(self, iterable, n=1):
         l = len(iterable)
