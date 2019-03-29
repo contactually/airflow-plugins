@@ -102,13 +102,14 @@ class HubspotHook(BaseHook, LoggingMixin):
         for record in payload:
             contact_id = record['contact_id']
             path = self.base_url + "contact/vid/{contact_id}".format(contact_id=contact_id)
-            response = self._delete(path)
             try:
+                response = self._delete(path)
                 response = json.loads(response.text)
                 if not response.get('deleted'):
                     self.log.error("Contact failed to delete with error {message}".format(message=response))
             except:
-                import ipdb; ipdb.set_trace()
+                self.log.error("Delete call failed with status code {status_code}. Delete call made to {path}".format(status_code=response.status_code, path=path))
+                continue
 
         return self.log.info("Delete contacts completed!")
 
