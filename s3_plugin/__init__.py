@@ -7,7 +7,7 @@ from s3_plugin.operators.s3_query_to_lambda_operator import S3QueryToLambdaOpera
 from s3_plugin.operators.s3_to_redshift_operator import S3ToRedshiftTransfer
 from s3_plugin.operators.upsert_s3_file_to_redshift_operator import UpsertS3FileToRedshiftOperator
 
-class EmailS3FilePlugin(AirflowPlugin):
+class S3Plugin(AirflowPlugin):
     name = "s3_plugin"
     operators = [EmailS3FileOperator, CustomRedshiftToS3Operator, S3QueryToRedshiftOperator, S3QueryToLambdaOperator, S3ToRedshiftTransfer, UpsertS3FileToRedshiftOperator]
     hooks = []
